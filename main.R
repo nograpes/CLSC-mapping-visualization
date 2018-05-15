@@ -12,6 +12,8 @@ csd16.shp <- readOGR(dsn = "data/csd", layer = "csd_qc_16", encoding = "UTF-8", 
 ct16.shp <- readOGR(dsn = "data/ct", layer = "ct_qc_16", encoding = "UTF-8", stringsAsFactors = FALSE)
 da16.shp <- readOGR(dsn = "data/da", layer = "da_qc_16", encoding = "UTF-8", stringsAsFactors = FALSE)
 clsc.shp <-readOGR(dsn = "data/clsc", layer="Territoires_CLSC_2017", encoding = "UTF-8", stringsAsFactors = FALSE)
+#cd16.shp <-spTransform(cd16.shp, CRS("+proj=lcc +lat_1=50 +lat_2=46 +lat_0=44 +lon_0=-70 +x_0=800000 +y_0=0 +datum=NAD83 +units=m +no_defs +ellps=GRS80 +towgs84=0,0,0."))
+#csd16.shp <-spTransform(csd16.shp,CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs +towgs84=0,0,0"))
 clsc.shp<-spTransform(clsc.shp, CRS(proj4string(csd16.shp)))
 
 # define UI
@@ -45,16 +47,31 @@ server <- function(input, output){
         ct <- as.character(mapping_table$census_id[mapping_table[[input$type]] == input$option & mapping_table$census_type == "CT"])
         da <- as.character(mapping_table$census_id[mapping_table[[input$type]] == input$option & mapping_table$census_type == "DA"])
         
-        plot <- tm_shape(clsc.shp) +
-                     tm_polygons(border.col = "black", alpha = 0.1, lwd=1) +
+        if (length(cd) >=1) {
+            plot <- tm_shape(clsc.shp) +
+                tm_polygons(border.col = "black", alpha = 0.1, lwd=1) +
                 tm_shape(cd16.shp[cd16.shp$CDUID %in% c(cd),]) +
-                    tm_polygons(border.col = "red", alpha = 0.2, lwd=2)
+                tm_polygons(border.col = "red", alpha = 0.2, lwd=2)
+        }
+        if (length(csd) >=1){
+            plot <- tm_shape(clsc.shp) +
+                tm_polygons(border.col = "black", alpha = 0.1, lwd=1) +
                 tm_shape(csd16.shp[csd16.shp$CSDUID %in% c(csd),])+
-                    tm_polygons(border.col = "red", alpha = 0.2, lwd=2) +
+                tm_polygons(border.col = "red", alpha = 0.2, lwd=2) 
+        }
+        if (length(da) >=1){
+            plot <- tm_shape(clsc.shp) +
+                tm_polygons(border.col = "black", alpha = 0.1, lwd=1) +
                 tm_shape(da16.shp[da16.shp$DAUID %in% c(da),])+
-                    tm_polygons(border.col = "red", alpha = 0.2, lwd=2) +
+                tm_polygons(border.col = "red", alpha = 0.2, lwd=2) 
+        }
+        if (length(ct) >=1){
+            plot <- tm_shape(clsc.shp) +
+                tm_polygons(border.col = "black", alpha = 0.1, lwd=1) +
                 tm_shape(ct16.shp[ct16.shp$CTUID %in% c(ct),])+
-                    tm_polygons(border.col = "green", alpha = 0.2, lwd=2) +
+                tm_polygons(border.col = "red", alpha = 0.2, lwd=2) 
+        }
+    
         tmap_leaflet(plot)
     })
     output$txt <- renderText({"Mapping table: "})
