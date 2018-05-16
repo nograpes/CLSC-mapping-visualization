@@ -19,16 +19,21 @@ clsc.shp<-spTransform(clsc.shp, CRS(proj4string(csd16.shp)))
 # define UI
 ui <- fluidPage(titlePanel("CLSC Mapping Visualization"), 
               # select clsc to map
-              selectInput(inputId = "type", 
-                          label = "select by code or name",
-                          choices = c("CLSC_code", "CLSC_nom"),
-                          selected = "CLSC_code"),
+              wellPanel(
+                  selectInput(inputId = "type", 
+                              label = "select by code or name",
+                              choices = c("CLSC_code", "CLSC_nom"),
+                              selected = "CLSC_code"),
+                  uiOutput("option1")),
               
               mainPanel(
-                  uiOutput("option1"),
-                  leafletOutput(outputId = "plot", height = 700, width = 1100),
-                  h3(textOutput("txt")), 
-                  tableOutput("table")
+                  fluidRow(
+                      column ("view in map", width = 10,leafletOutput(outputId = "plot")),
+                      column ("View in table", width = 2,tableOutput("table"))
+                  )
+                  #leafletOutput(outputId = "plot", height = 700, width = 1100),
+                  # h3(textOutput("txt")), 
+                  # tableOutput("table")
               )
              
  )
@@ -74,7 +79,6 @@ server <- function(input, output){
     
         tmap_leaflet(plot)
     })
-    output$txt <- renderText({"Mapping table: "})
     output$table <- renderTable({mapping_table[mapping_table$CLSC_code == input$option,2:ncol(mapping_table)]})
 }
 
