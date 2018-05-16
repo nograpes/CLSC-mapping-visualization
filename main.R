@@ -12,23 +12,23 @@ csd16.shp <- readOGR(dsn = "data/csd", layer = "csd_qc_16", encoding = "UTF-8", 
 ct16.shp <- readOGR(dsn = "data/ct", layer = "ct_qc_16", encoding = "UTF-8", stringsAsFactors = FALSE)
 da16.shp <- readOGR(dsn = "data/da", layer = "da_qc_16", encoding = "UTF-8", stringsAsFactors = FALSE)
 clsc.shp <-readOGR(dsn = "data/clsc", layer="Territoires_CLSC_2017", encoding = "UTF-8", stringsAsFactors = FALSE)
+#cd16.shp <-spTransform(cd16.shp, CRS("+proj=lcc +lat_1=50 +lat_2=46 +lat_0=44 +lon_0=-70 +x_0=800000 +y_0=0 +datum=NAD83 +units=m +no_defs +ellps=GRS80 +towgs84=0,0,0."))
+#csd16.shp <-spTransform(csd16.shp,CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs +towgs84=0,0,0"))
 clsc.shp<-spTransform(clsc.shp, CRS(proj4string(csd16.shp)))
 
 # define UI
 ui <- fluidPage(titlePanel("CLSC Mapping Visualization"), 
               # select clsc to map
-              wellPanel(
-                  selectInput(inputId = "type", 
-                              label = "select by code or name",
-                              choices = c("CLSC_code", "CLSC_nom"),
-                              selected = "CLSC_code"),
-                  uiOutput("option1")),
+              selectInput(inputId = "type", 
+                          label = "select by code or name",
+                          choices = c("CLSC_code", "CLSC_nom"),
+                          selected = "CLSC_code"),
               
               mainPanel(
-                  fluidRow(
-                      column ("view in map", width = 10,leafletOutput(outputId = "plot")),
-                      column ("View in table", width = 2,tableOutput("table"))
-                  )
+                  uiOutput("option1"),
+                  leafletOutput(outputId = "plot", height = 700, width = 1100),
+                  h3(textOutput("txt")), 
+                  tableOutput("table")
               )
              
  )
@@ -74,6 +74,7 @@ server <- function(input, output){
     
         tmap_leaflet(plot)
     })
+    output$txt <- renderText({"Mapping table: "})
     output$table <- renderTable({mapping_table[mapping_table$CLSC_code == input$option,2:ncol(mapping_table)]})
 }
 
