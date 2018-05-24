@@ -6,7 +6,7 @@ library(leaflet)
 library(dplyr)
 
 # load data
-mapping_table<-read.csv("mapping_table_cleaned.csv", stringsAsFactors = FALSE)
+mapping_table<-read.csv("mapping_table_cleaned.csv", stringsAsFactors = FALSE, fileEncoding = "latin1")
 cd16.shp <- readOGR(dsn = "data/cd", layer = "cd_qc_16", encoding = "UTF-8", stringsAsFactors = FALSE)
 csd16.shp <- readOGR(dsn = "data/csd", layer = "csd_qc_16", encoding = "UTF-8", stringsAsFactors = FALSE)
 ct16.shp <- readOGR(dsn = "data/ct", layer = "ct_qc_16", encoding = "UTF-8", stringsAsFactors = FALSE)
